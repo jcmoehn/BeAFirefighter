@@ -1,0 +1,192 @@
+
+Mariadb installieren:
+npm install mariadb
+
+Mariadb starten:
+# systemctl start mariadb (einmaliges starten)
+# systemctl enable mariadb (automatisches starten bei Start des Servers)
+
+Datenbank erstellen:
+
+CREATE DATABASE name;
+
+USE name
+
+CREATE TABLE `Standardgeraetschaft` (
+  `StandardID` int(11) NOT NULL,
+  `Geraetebezeichnung` varchar(255) NOT NULL,
+  `Beschreibung` varchar(255) DEFAULT NULL,
+  `Kategorie` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`StandardID`,`Geraetebezeichnung`)
+);
+
+
+CREATE TABLE `Sonderbeladung` (
+  `SonderID` int(11) NOT NULL AUTO_INCREMENT,
+  `Geraetebezeichnung` varchar(255) NOT NULL,
+  `Beschreibung` varchar(255) DEFAULT NULL,
+  `Kategorie` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`SonderID`,`Geraetebezeichnung`)
+);
+
+CREATE TABLE `Fahrzeugtypen` (
+  `Fahrzeugtyp` varchar(255) NOT NULL,
+  `Beschreibung` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Fahrzeugtyp`)
+);
+
+ CREATE TABLE `Feuerwehrfahrzeuge` (
+  `FahrzeugID` int(11) NOT NULL AUTO_INCREMENT,
+  `Fahrzeugtyp` varchar(255) NOT NULL,
+  PRIMARY KEY (`FahrzeugID`),
+  KEY `Fahrzeugtyp` (`Fahrzeugtyp`),
+  FOREIGN KEY (`Fahrzeugtyp`) REFERENCES `Fahrzeugtypen` (`Fahrzeugtyp`)
+);
+
+CREATE TABLE `BeladungsID` (
+  `FahrzeugID` int(11) NOT NULL,
+  `Geraeteraum` varchar(2) DEFAULT NULL,
+  `HitboxID` int(11) NOT NULL AUTO_INCREMENT,
+  `Fachseite` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`HitboxID`),
+  KEY `FahrzeugID` (`FahrzeugID`),
+  FOREIGN KEY (`FahrzeugID`) REFERENCES `Feuerwehrfahrzeuge` (`FahrzeugID`)
+);
+
+CREATE TABLE `Feuerwehr` (
+  `Name` varchar(255) NOT NULL,
+  `Verantwortlicher` varchar(255) DEFAULT NULL,
+  `Adresse` varchar(255) DEFAULT NULL,
+  `FahrzeugID` int(11) NOT NULL,
+  PRIMARY KEY (`Name`),
+  KEY `FahrzeugID` (`FahrzeugID`),
+  FOREIGN KEY (`FahrzeugID`) REFERENCES `Feuerwehrfahrzeuge` (`FahrzeugID`)
+);
+
+CREATE TABLE `HitboxID` (
+  `HitboxID` int(11) NOT NULL,
+  `FachID` bigint(20) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`FachID`),
+  KEY `HitboxID` (`HitboxID`),
+  FOREIGN KEY (`HitboxID`) REFERENCES `BeladungsID` (`HitboxID`)
+) ;
+
+CREATE TABLE `Torhitbox` (
+  `HitboxID` int(11) NOT NULL,
+  `Pixel` double NOT NULL,
+  `Koordinate` varchar(255) DEFAULT NULL,
+  `RaumID` int(11) DEFAULT NULL,
+  KEY `HitboxID` (`HitboxID`),
+  FOREIGN KEY (`HitboxID`) REFERENCES `BeladungsID` (`HitboxID`)
+);
+
+CREATE TABLE `Fachliste` (
+  `FachID` bigint(20) NOT NULL,
+  `PixelFach` double DEFAULT NULL,
+  `Koordinate` varchar(255) DEFAULT NULL,
+  `StandardID` int(11) DEFAULT NULL,
+  `SonderID` int(11) DEFAULT NULL,
+  `KoordinatenID` int(11) DEFAULT NULL,
+  KEY `FachID` (`FachID`),
+  KEY `StandardID` (`StandardID`),
+  KEY `SonderID` (`SonderID`),
+  FOREIGN KEY (`FachID`) REFERENCES `HitboxID` (`FachID`),
+  FOREIGN KEY (`StandardID`) REFERENCES `Standardgeraetschaft` (`StandardID`),
+  FOREIGN KEY (`SonderID`) REFERENCES `Sonderbeladung` (`SonderID`)
+);
+
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(1,'Feuerwehraxt','Zum gewaltsamen Öffnen von Holztüren /-verschlägen im Löschangriff','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(2,'CM-Strahlrohr','Zur variablen Wasserabgabe (Sprüh- oder Vollstrahl)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(3,'C-Hohlstrahlrohr','Zur variablen Wasserabgabe (Sprühstrahl, Vollstrahl oder Mannschutzbrause; Durchflussmenge regulierbar','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(4,'BM-Strahlrohr','Zur variablen Wasserabgabe (Sprüh- oder Vollstrahl)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(5,'B-Hohlstrahlrohr','Zur variablen Wasserabgabe (Sprühstrahl, Vollstrahl oder Mannschutzbrause; Durchflussmenge regulierbar','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(6,'Kombischaumrohr M4/S4','Zur Abgabe von Schwer- oder Mittelschaum','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(7,'Stützkrümmer','Zur Entlastung bei der Verwendung des B-Strahlrohres (nur noch zwei statt drei Personen benötigt)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(8,'Zumischer Z2-R','Zumischer für Schaummittel mit Durchflussmenge von 200 L/Min und regelbarem Schaummittelverhältnisses','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(9,'Zumischer Z4-R','Zumischer für Schaummittel mit Durchflussmenge von 400 L/Min und regelbarem Schaummittelverhältnisses','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(10,'B-Druckschlauch 20 Meter','Zur Wasserförderung oder -abgabe','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(11,'B-Druckschlauch 5 Meter','Zur Wasserförderung oder -abgabe','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(12,'B-Druckschlauch 35 Meter','Zur Wasserförderung oder -abgabe (Haupteinsatz auf der Drehleiter)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(13,'C-Druckschlauch 15 Meter','Zur Wasserförderung oder -abgabe','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(14,'C-Druckschlauch 20 Meter','Zur Wasserförderung oder -abgabe','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(15,'C-Druckschlauch 30 Meter','Zur Wasserförderung oder -abgabe','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(16,'Verteiler','Zum Verteilen der ankommenden Wassermenge auf bis zu drei Angriffsleitungen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(17,'A-Saugschlauch','Zur Wasserentnahme aus offenen Gewässern, Löschteichen, Löschwasserzisternen, etc.','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(18,'Saugkorb','Zum Schutz der Feuerlöschkreiselpumpe vor größeren Gegenständen/Tieren, die angesaugt werden könnten','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(19,'Sammelstück','Zur Zusammenführung von B-Leitungen, damit eine größe Wassermenge weitergefördert werden kann','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(20,'Standrohr','Zur Wasserentnahme aus Unterflurhydranten','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(21,'Schlauchhaspel','Aufgerollte B-Schläuche zum schnellen Verlegen einer langen Wegstrecke','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(22,'Schmutzfangkorb','Überkorb für den Saugkorb zur feineren Filterung von Störelementen, die angesaugt werden könnten','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(23,'Halteleine','Sicherungsleine um die Saugleitungen in stark fließenden Gewässern zu befestigen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(24,'Ventilleine','Leine, die am Saugkorb befestigt wird, um die Wassersäule aus den Saugschläuchen abzulassen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(25,'Spitzhammer','Wird verwendet, um beispielsweise Hydrantendeckel ohne Standrohrschlüssel zu öffnen','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(26,'Feuerlöschkreiselpumpe','Motorbetriebene Pumpe zur Wasserförderung aus offenen Gewässern oder zur Druckerhöhung in den Leitungen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(27,'Säbelsäge','Wird verwendet um beispielsweise A-Säule und Windschutzscheibe eines Autos zu zersägen','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(28,'Stoßbesen','Zum Aufkehren von Ölbindemittel, Fahrzeugteilen, Ästen, etc.','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(29,'Drahtseil','Zum Absichern von PKW oder Abschleppen/Ziehen anderer Fahrzeuge','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(30,'Tauchpumpe','Zum Auspumpen von vollgelaufenen Schächten, Kellern, etc.','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(31,'Holzkeile','Zum Unterbauen von Fahrzeugen/umgestürzten Gegenständen, die angehoben oder abgesichert werden sollen','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(32,'Unterlegkeile','Zum Sichern gegen Wegrollen von verunfallten/fremden Fahrzeugen oder dem eigenen Fahrzeug','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(33,'Erdanker','Zur festen Verankerung von Gegenständen im Boden, die drohen abzurutschen, abzustürzen oder umzustürzen','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(34,'Erdnägel','Zum Abspannen von beispielsweise dem Lichtmast bei starkem Wind','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(35,'Rundschlinge','Wird um den Oberkörper einer Person gelegt, um diese leichter aus Gefahrenbereichen zu ziehen; oder zum ziehen schwerer Gegenstände','Menschenrettung/Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(36,'Schäkel','Wird als Verbinder verwendet, um bespielsweise Gegenstände ziehen zu können','Hilfeleistung/Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(37,'Kaminkehrgerät','Wird verwendet um brennenden Ruß aus Kaminen zu kehren um diesen ablöschen zu können','Löschangriff/Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(38,'Spineboard','Zum Tragen von verletzten/verunfallten Personen','Hilfeleistung/Menschenrettung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(39,'Belüftungsgerät','Zum Belüften verrauchter Räume/Gebäude mit Frischluft, um Brandrauch aus den Räumen/Gebäuden zu bekommen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(40,'Schüttmulden','Zum Auffangen auslaufender Flüssigkeiten oder Tragen von heißem Brandgut','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(41,'Halligan Tool','Zum Aufbrechen von Türen, Hebeln von schweren Gegenständen, verkeilen von Türen, etc','Löschangriff/Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(43,'Schlauchtragekorb C','Schlauchtragekorb gefüllt mit drei C-Druckschläuchen zum schnelleren Verlegen einer Angriffsleitung','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(44,'Schlauchtragekorb B','Schlauchtragekorb gefüllt mit drei B-Druckschläuchen zum schnelleren Verlegen einer Angriffsleitung','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(45,'Rauchschutzvorhang','Wird in den Türrahmen an der Rauchgrenze eingehängt, um ein Verrauchen der restlichen Gebäudeteile beim Öffnen der Tür zu verhindern','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(46,'Schnellangriffverteiler','Verteiler mit angeschlossenem B-Druckschlauch, um die Wasserversorgung schneller herstellen zu können','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(47,'FI/DI Schutzschalter','Schutzschalter für Stromleitungen, um die Stromentnahme über einen Hausanschluss abzusichern, damit das eigene Personal geschützt ist','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(48,'Waldarbeiterhelme','Helm mit Gittervisier und Gehörschutz; Pflichtausrüstung zur Verwendung der Motorkettensäge','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(49,'Stativ','Stativ zum Aufstellen und erhöhen der Flutlichtstrahler','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(50,'Aufnahmebrücke','Wird auf dem Stativ angebracht, um die Flutlichtstrahler mit dem Stativ zu verbinden','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(51,'Bolzenschneider','Zum Öffnen von verplombten Kontainern, Zäunen, Vorhängeschlössern, etc.','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(52,'Kabeltrommel','Kabeltrommel mit 50m Kabel zur Verlängerung der Stromleitung','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(53,'Flutlichtstrahler','Zur Ausleuchtung der Einsatzstelle, um die Arbeit im dunkeln zu erleichten/ermöglichen','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(54,'Abgasschlauch','Abgasschlauch um die Abgase der Geräte weiter vom Gerät weg abzuleiten','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(55,'Motorkettensäge','Zum Schneiden aller Arten von Holz, wie beispielsweise Bäume, Holztüren, Hecken, etc.','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(56,'Kraftstoffkanister 5L','Zum Auftanken während oder nach einem Einsatz der Gerätschaften, wie beispielsweise den Stromerzeuger','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(57,'Stromerzeuger','Zur Erzeugung einer eigenen, unabhängigen Stromversorgung, um beispielsweise die Flutlichtstrahler zu betreiben','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(58,'Verkehrsleitkegel','Zur Absicherung oder Sperrung der Einsatzstelle','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(59,'Stabblitzleuchten','Zur Absicherung oder Sperrung der Einsatzstelle mit Warnlicht','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(60,'Pulverlöscher','Feuerlöscher mit Löschmittel Pulver','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(61,'CO2-Löscher','Feuerlöscher mit Löschmittel CO2','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(62,'Kübelspritze','Kübel gefüllt mit Löschwasser und Handdruckpumpe für kleinere Brände','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(63,'Löschdecke','Feuerfeste Decke zum Ersticken kleiner Brände in Gefäßen, beispielsweise in Töpfen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(64,'Übergangsstück B/C','Zum Verbinden eines B-Druckschlauches mit einem C-Druckschlauch; Nur B auf C, nicht andersherum','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(65,'Übergangsstück C/D','Zum Verbinden eines C-Druckschlauches mit einem D-Druckschlauch; Nur C auf D, nicht andersherum','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(66,'Schachthaken','Zum Anheben von Kanalabdeckungen, Schachtabdeckungen, etc.','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(67,'Hydrantenschlüssel','Zum Öffnen von Überflurhydranten','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(68,'Standrohrschlüssel','Zum Öffnen von Unterflurhydranten und deren Abdeckungen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(69,'Atemschutzüberwachung','Tabelle um die Drücke und weitere wichtige Informationen, die ein Trupp im Innenangriff durchgibt festzuhalten und zu überwachen','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(70,'Seilschlauchhalter','Zum Befestigen der Schläuche im Innenangriff, beispielsweise an Treppengeländern, damit diese nicht zurück rutschen oder abrutschen können','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(71,'Dreiteilige Schiebleiter','Ausziehbare Leiter mit einer Gesamtlänge von 14m und einer Rettungs- und Arbeitshöhe von ca 12m (3. OG)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(72,'Dreiteilige Schiebleiter','Ausziehbare Leiter mit einer Gesamtlänge von 8,4m und einer Rettungs- und Arbeitshöhe von ca 7m (2. OG)','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(73,'Schaufel','Zum Wegschaufeln von Dreck, Schutt, heißer Asche, heißem Brandgut, etc.','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(74,'Fahrzeugfunkgerät','Funkgerät um mit der Leitstelle oder anderen Einsatzfahrzeugen zu kommunizieren','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(75,'Handsprechfunkgerät','Funkgerät zur Kommunikation zwischen den Einsatzkräften untereinander und dem Einsatzleiter','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(76,'Außensprechanlage','Zur Kommunikation mit anderen Verkehrsteilnehmern oder der Warnung der Bevölkerung','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(77,'Handlampe','Persönliches Leuchtmittel für den Innenangriff oder andere Einsatzstellen, an denen kein Licht ist/hin kommt','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(78,'Atemschutzgerät','Umluftunabhängige Atemluftversorgung für Einsatzkräfte in verrauchten oder mit Atemgiften verseuchten Bereichen','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(79,'Atemschutzmaske','Maske für den Atemschutzgeräteträger, die als Anschlussmöglichkeit für das Gerät und gleichzeitig als Schutzvisier dient','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(80,'Warnkelle','Zum Warnen des fließenden Verkehrs vor einer Einsatzstelle oder Sperrung','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(81,'Leinenbeutel','Beutel mit 30m Leineninhalt; Dient zur Sicherung des Rückweges, der Eigensicherung, der Sicherung von Geräten oder der Selbst- bzw. Menschenrettung','Löschangriff');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(82,'Medizinische Handschuhe','Werden unter die Arbeitshandschue gezogen, um sich selbst bei der Hilfeleistung vor übertragbaren Krankheiten oder Kontamination zu schützen','Hilfeleistung');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(83,'Warnwesten','Müssen bei Einsätzen mit fließendem Verkehr getragen werden, wenn die Reflektionsfläche der Einsatzkleidung nicht ausreicht; Dient zum Eigenschutz','Sonstiges');
+INSERT INTO Standardgeraetschaft (StandardID, Geraetebezeichnung, Beschreibung, Kategorie) Values(84,'Schutzbrillen','Müssen bei Hilfeleistungseinsätzen getragen werden, wenn Gefahr durch Funkenflug oder splitternde Teile für die Augen besteht','Sonstiges/Hilfeleistung');
+
+
+Datanbank öffentlich zugänglich machen (Dringend notwendig für die Funktionalität der Website):
+GRANT ALL PRIVILEGES ON Datenbankname . * TO host@localhost;
+
+Datenbankbackup erstellen:
+Mariadb> CREATE DATABASE backup;
+Home> mysqldump -u root -p Datenbankname > home:\Datenbankname.sql
+Home> mysql -u root -p backup < home:\Datenbankname.sql
+
+
+
